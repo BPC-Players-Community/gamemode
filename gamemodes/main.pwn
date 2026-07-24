@@ -1,44 +1,43 @@
 #include <open.mp>
 
-#include <sscanf2>
-#include <streamer>
-#include <Pawn.CMD>
-#include <YSI_Coding\y_hooks>
-#include <YSI_Data\y_iterate>
-#include <easyDialog>
-#include <a_mysql>
-#include <whirlpool>
-#include <WeatherSystem>
+// #include <sscanf2>
+// #include <streamer>
+// #include <Pawn.CMD>
+// #include <YSI_Data\y_iterate>
+// #include <easyDialog>
+// #include <a_mysql>
+// #include <whirlpool>
+// #include <WeatherSystem>
 
-#include <gametext_plus>
-#define OVERRIDE_NATIVE_GAMETEXT
+// #include <gametext_plus>
+// #define OVERRIDE_NATIVE_GAMETEXT
 
-#include "modules/core/colors.inc"
+// #include "modules/core/colors.inc"
 
-#include "modules/player/player.inc"
+// #include "modules/player/player.inc"
 
-#include "modules/character/character.inc"
+// #include "modules/character/character.inc"
 
-#include "modules/account/account.inc"
-#include "modules/account/dialogs.inc"
+// #include "modules/account/account.inc"
+// #include "modules/account/dialogs.inc"
 
-#include "modules/admin/admin.inc"
-#include "modules/admin/comandos.inc"
+// #include "modules/admin/admin.inc"
+// #include "modules/admin/comandos.inc"
 
 /*
 #include "modules/player/fome.inc"
 #include "modules/player/payday.inc"
 */
-#include "modules/player/comandos.inc"
-#include "modules/player/death/death.inc"
-#include "modules/player/death/commands.inc"
+// #include "modules/player/comandos.inc"
+// #include "modules/player/death/death.inc"
+// #include "modules/player/death/commands.inc"
 
-#include "modules/chat/chat.inc"
-#include "modules/chat/comandos.inc"
+// #include "modules/chat/chat.inc"
+// #include "modules/chat/comandos.inc"
 
-#include "modules/animation/comandos.inc"
+// #include "modules/animation/comandos.inc"
 
-#include "modules/veiculo/comandos.inc"
+// #include "modules/veiculo/comandos.inc"
 
 /*
 #include "modules/company/company.inc"
@@ -48,7 +47,7 @@
 #include "modules/company/pizzeria.inc"
 #include "modules/company/bank.inc"
 */
-#include "modules/time/time.inc"
+// #include "modules/time/time.inc"
 
 /*
 #include "modules/empregos/comandos.inc"
@@ -60,7 +59,7 @@
 #include "modules/audio/musica_login.inc"
 */
 
-forward AtualizarSistema();
+// forward AtualizarSistema();
 
 main() 
 {
@@ -69,7 +68,7 @@ main()
 	print("  |--- BPC Player's Community");
     print("  |--  Script v0.0.0");
     print("  |--  23 de Julho de 2026");
-	print("  |---------------------------------------------------");
+	print("  |---------------------------------------------------\n");                                                                                                                        $$$$$$/  ");
 }
 
 /*
