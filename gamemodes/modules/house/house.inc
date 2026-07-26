@@ -1,3 +1,11 @@
+/*
+    FilterScript Sistema de casas C-Casas.
+    Criado por Cleyson Stein - StNN
+    Nгo retire os crйditos.
+    Todos os direitos reservados. 02/05/2018*
+    
+*/
+
 #include <YSI_Coding\y_hooks>
 
 enum
