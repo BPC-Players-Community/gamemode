@@ -415,7 +415,7 @@ CMD:veiculo(playerid, params[])
 	new Float:x, Float:y, Float:z, Float:angle;
 	GetPlayerPos(playerid, x, y, z);
 	GetPlayerFacingAngle(playerid, angle);
-	CreateVehicle(vehicleid, x, y, z, angle, -1, -1, -1, true);
+	CreateVehicle(vehicleid, x + 1, y + 1, z, angle, -1, -1, -1, true);
 	PutPlayerInVehicle(playerid, vehicleid, 0);
 	return 1;
 }
