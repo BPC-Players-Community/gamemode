@@ -11,6 +11,7 @@ npcmodes/
 pawno/
 qawno/
 *.ini
+*.db
 
 logs/
 
