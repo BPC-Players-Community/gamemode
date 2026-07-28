@@ -1,0 +1,159 @@
+
+// ============= COMMANDS ADMIN
+CMD:acasa(playerid)
+{
+    if(!IsPlayerAdmin(playerid)) return SendClientMessage(playerid, VERMELHO, "Comando restrito a administradores.");
+    new String_COMANDOS[220]; //
+    format(String_COMANDOS, sizeof String_COMANDOS, "");
+    
+    strcat(String_COMANDOS, "{009900}ADMIN C-CASAS\n\n"); 
+    strcat(String_COMANDOS, "{CECECE}/criarcasa {FFFFFF}- Criar uma casa.\n");
+    strcat(String_COMANDOS, "{CECECE}/editarcasa {FFFFFF}- Editar uma casa.\n");
+    strcat(String_COMANDOS, "{CECECE}/deletarcasa {FFFFFF}- Deletar casa.\n");
+    strcat(String_COMANDOS, "{CECECE}/ircasa {FFFFFF}- Ir a uma casa.\n");
+    ShowPlayerDialog(playerid, 9545, DIALOG_STYLE_MSGBOX, "Comandos Admin C-Casas", String_COMANDOS, "Ok", "");
+    return 1;
+}
+CMD:criarcasa(playerid, params[])
+{
+    if(!IsPlayerAdmin(playerid)) return SendClientMessage(playerid, VERMELHO, "Comando restrito a administradores.");
+    if(sscanf(params, "ii", params[0], params[1])) return SendClientMessage(playerid, CINZA, "Use /criarcasa [preco] [int 0a10]");
+    Criar_Casa(playerid, TOTALCASA+1, params[0], params[1]);
+    return 1;
+}
+CMD:ircasa(playerid, params[])
+{
+    if(!IsPlayerAdmin(playerid)) return SendClientMessage(playerid, VERMELHO, "Comando restrito a administradores.");
+    if(sscanf(params, "i", params[0])) return SendClientMessage(playerid, CINZA, "Use /ircasa [id]");
+    Ir_Casa(playerid, params[0]);
+    return 1;
+}
+CMD:editarcasa(playerid, params[])
+{
+    if(!IsPlayerAdmin(playerid)) return SendClientMessage(playerid, VERMELHO, "Comando restrito a administradores.");
+    if(sscanf(params, "iii", params[0], params[1], params[2])) return SendClientMessage(playerid, CINZA, "Use /editarcasa [id] [preco] [int 0a10]");
+    Editar_Casa(playerid, params[0], params[1], params[2]);
+    return 1;
+}
+CMD:deletarcasa(playerid, params[])
+{
+    if(!IsPlayerAdmin(playerid)) return SendClientMessage(playerid, VERMELHO, "Comando restrito a administradores.");
+    if(sscanf(params, "i", params[0])) return SendClientMessage(playerid, CINZA, "Use /deletarcasa [id]");
+    Deletar_Casa(playerid, params[0]);
+    return 1;
+}
+// ================= COMMANDS PLAYERS
+/*CMD:dinheiro(playerid)
+{
+    GivePlayerMoney(playerid, 500000);
+    return 1;
+}
+*/
+CMD:comprarcasa(playerid)
+{
+    for(new i = 0; i < MAX_CASAS; i++)
+    {
+        if(IsPlayerInRangeOfPoint(playerid, 1, c[i][cX], c[i][cY], c[i][cZ]))
+        {
+            if(p[playerid][TemCasa] > 0) return SendClientMessage(playerid, VERMELHO, "Vocк ja possue uma casa.");
+            if(c[i][cTemDono] == 1) return SendClientMessage(playerid, VERMELHO, "Essa casa ja possue dono.");
+            if(GetPlayerMoney(playerid) < c[i][cPreco]) return SendClientMessage(playerid, VERMELHO, "Dinheiro insuficiente.");
+            format(c[i][cDono], 24, p[playerid][Nome]);
+            c[i][cTemDono] = 1;
+            p[playerid][TemCasa] = i;
+            SendClientMessage(playerid, LARANJA, "Casa adiquirida com sucesso.");
+            GivePlayerMoney(playerid, -c[i][cPreco]);
+            DestroyDynamicPickup(c[i][cPickup]);
+            DestroyDynamicMapIcon(c[i][cIcone]);
+            DestroyDynamic3DTextLabel(c[i][cText]);
+            new texto[200];
+            c[i][cIcone] = CreateDynamicMapIcon(c[i][cX], c[i][cY], c[i][cZ], 32, -1);
+            c[i][cPickup] = CreateDynamicPickup(19522, 21, c[i][cX], c[i][cY], c[i][cZ]);//1272
+            
+            format(texto, sizeof(texto), "{B22222}CASA ID: {FFFFFF}%d\n{CD5C5C}Dono: {FFFFFF}%s\n{CD5C5C}Preзo: {FFFFFF}$ %d{CD5C5C}\n/ajudacasa", i, c[i][cDono], c[i][cPreco]);
+            c[i][cText] = CreateDynamic3DTextLabel(texto, 0xFFFFFFAA, c[i][cX], c[i][cY], c[i][cZ]+1, 20);
+            new Query[80];
+            format(Query, sizeof(Query), "UPDATE CASAS SET DONO ='%s', TEMDONO = 1 WHERE ID =%d", c[i][cDono], i);
+            DB_ExecuteQuery(Database, Query);
+            break;
+        }
+    }
+    return 1;
+}
+CMD:vendercasa(playerid)
+{
+    for(new i = 0; i < MAX_CASAS; i++)
+    {
+        if(IsPlayerInRangeOfPoint(playerid, 1, c[i][cX], c[i][cY], c[i][cZ]))
+        {
+            if(p[playerid][TemCasa] == 0) return SendClientMessage(playerid, VERMELHO, "Vocк nгo possue uma casa.");
+            if(c[i][cTemDono] == 0) return SendClientMessage(playerid, VERMELHO, "Essa casa nгo possue dono.");
+            if(p[playerid][TemCasa] == i)
+            {
+                SendClientMessage(playerid, LARANJA, "Casa vendida com sucesso.");
+                GivePlayerMoney(playerid, c[i][cPreco]/2);
+                format(c[i][cDono], 24, "Nenhum");
+                c[i][cTemDono] = 0;
+                p[playerid][TemCasa] = 0;
+                DestroyDynamicPickup(c[i][cPickup]);
+                DestroyDynamicMapIcon(c[i][cIcone]);
+                DestroyDynamic3DTextLabel(c[i][cText]);
+                new texto[200];
+                c[i][cIcone] = CreateDynamicMapIcon(c[i][cX], c[i][cY], c[i][cZ], 31, -1);
+                c[i][cPickup] = CreateDynamicPickup(1273, 21, c[i][cX], c[i][cY], c[i][cZ]);
+                format(texto, sizeof(texto), "{2E8B57}CASA ID: {FFFFFF}%d\n{3CB371}Dono: {FFFFFF}%s\n{3CB371}Preзo: {FFFFFF}$ %d\n{3CB371}Aperte 'F' para entrar\n/ajudacasa", i, c[i][cDono], c[i][cPreco]);
+                c[i][cText] = CreateDynamic3DTextLabel(texto, 0xFFFFFFAA, c[i][cX], c[i][cY], c[i][cZ]+1, 20);
+                new Query[80];
+                format(Query, sizeof(Query), "UPDATE CASAS SET DONO ='%s', TEMDONO = 0 WHERE ID =%d", c[i][cDono], i);
+                DB_ExecuteQuery(Database, Query);
+                break;
+                } else {
+                SendClientMessage(playerid, VERMELHO, "Essa casa nгo й sua.");
+                return 1;
+               }
+        }
+    }
+    return 1;
+}
+CMD:trancar(playerid)
+{
+    for(new i = 0; i < MAX_CASAS; i++)
+    {
+        if(IsPlayerInRangeOfPoint(playerid, 1, c[i][cX], c[i][cY], c[i][cZ]))
+        {
+            if(p[playerid][TemCasa] == 0) return SendClientMessage(playerid, VERMELHO, "Vocк nгo possue uma casa.");
+            if(c[i][cTemDono] == 0) return SendClientMessage(playerid, VERMELHO, "Essa casa nгo possue dono.");
+            if(p[playerid][TemCasa] == i)
+            {
+                new Query[80];
+                if(c[i][cTrancada] == 0)
+                {
+                    SendClientMessage(playerid, LARANJA, "Casa trancada.");
+                    c[i][cTrancada] = 1;
+                    
+                    format(Query, sizeof(Query), "UPDATE CASAS SET TRANCADA = 1 WHERE ID =%d", i);
+                    DB_ExecuteQuery(Database, Query);
+                    break;
+                    
+                    } else {
+                    
+                    SendClientMessage(playerid, LARANJA, "Casa destrancada.");
+                    c[i][cTrancada] = 0;
+                    
+                    format(Query, sizeof(Query), "UPDATE CASAS SET TRANCADA = 0 WHERE ID =%d", i);
+                    DB_ExecuteQuery(Database, Query);
+                    break;
+                }
+                } else {
+                SendClientMessage(playerid, VERMELHO, "Essa casa nгo й sua.");
+                return 1;
+               }
+        }
+    }
+    return 1;
+}
+CMD:ajudacasa(playerid)
+{
+    ShowPlayerDialog(playerid, 9595, DIALOG_STYLE_MSGBOX, "Ajuda C-Casas","{009900}CASAS\n\n{CECECE}/comprarcasa {FFFFFF}- Comprar uma casa.\n{CECECE}/vendercasa {FFFFFF}- Vender sua casa.\n{CECECE}/trancar {FFFFFF}- trancar | destrancar casa.\n", "Ok", "");
+    return 1;
+}

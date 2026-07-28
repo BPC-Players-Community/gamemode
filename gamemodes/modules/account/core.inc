@@ -21,13 +21,13 @@ static s_AccountData[MAX_PLAYERS][e_ACCOUNT_DATA];
 new s_AccountPasswordHash[MAX_PLAYERS][HASH_LEN]; // *
 new MySQL:g_SQL;
 
-public OnGameModeInit()
+hook OnGameModeInit()
 {
     ConnectToDatabase();
     return 1;
 }
 
-public OnGameModeExit()
+hook OnGameModeExit()
 {
     foreach (new i : Player) {
         if (IsPlayerConnected(i)) {
@@ -47,7 +47,7 @@ hook OnPlayerConnect(playerid)
     return 1;
 }
 
-public OnPlayerRequestClass(playerid, classid)
+hook OnPlayerRequestClass(playerid, classid)
 {
 	if (IsPlayerNPC(playerid)) {
 		return 1;
@@ -57,14 +57,14 @@ public OnPlayerRequestClass(playerid, classid)
 	return 1;
 }
 
-public OnPlayerRequestSpawn(playerid)
+hook OnPlayerRequestSpawn(playerid)
 {
     // Debug
 	printf("Player %d requested spawn", playerid);
     return 0;
 }
 
-public OnPlayerSpawn(playerid)
+hook OnPlayerSpawn(playerid)
 {
     if (HasPlayerLogged(playerid)) {
         GivePlayerMoney(playerid, GetCharacterCash(playerid));
@@ -74,7 +74,7 @@ public OnPlayerSpawn(playerid)
     return 1;
 }
 
-public OnPlayerDisconnect(playerid, reason)
+hook OnPlayerDisconnect(playerid, reason)
 {
     if (HasPlayerLogged(playerid)) {
         SavePlayerAccount(playerid);
