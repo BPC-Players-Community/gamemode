@@ -47,7 +47,7 @@ hook OnPlayerSpawn(playerid)
     return 1;
 }
 
-stock GetServerTime(&hour, &minute)
+stock GetServerTime(&hour, &minute = 0)
 {
     hour = s_WorldHour;
     minute = s_WorldMinute;
