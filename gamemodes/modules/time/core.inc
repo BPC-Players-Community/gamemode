@@ -1,4 +1,4 @@
-#include <YSI_Coding\y_hooks>
+#include <pp-hooks>
 
 #define TIMER_INTERVAL      1000
 #define MINUTES_PER_TICK    1
