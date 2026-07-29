@@ -22,7 +22,7 @@
 #endif
 #define _weathersystem_included
 #include <streamer>
-#include <YSI_Coding\y_hooks>
+#include <pp-hooks>
 #include <foreach>
 
         // Definições
@@ -105,16 +105,12 @@ hook OnGameModeInit() {
     g_AreaWeather[E_CITY_LS] = CreateDynamicRectangle(-790.0, -3000.0, 3000.0, 548.0);
     g_AreaWeather[E_CITY_SF] = CreateDynamicRectangle(-3000.0, -3000.0, -784.0, 3000.0);
     g_AreaWeather[E_CITY_LV] = CreateDynamicRectangle(-790.0, 548.0, 3000.0, 3000.0);
-
-    return Y_HOOKS_CONTINUE_RETURN_1;
 }
 
 hook OnPlayerSpawn(playerid) {
 
     UpdatePlayerWeather(playerid);
     g_LastPlayerCity[playerid] = GetPlayerCity(playerid);
-
-    return Y_HOOKS_CONTINUE_RETURN_1;
 }
 /*
 
@@ -145,8 +141,7 @@ public OnPlayerEnterDynamicArea(playerid, STREAMER_TAG_AREA:areaid) {
             g_LastPlayerCity[playerid] = weather_city;
             SetPlayerWeather(playerid, g_CityWeather[weather_city]);
         }
-    } 
-    return Y_HOOKS_CONTINUE_RETURN_1;
+    }
 }
 
 /*

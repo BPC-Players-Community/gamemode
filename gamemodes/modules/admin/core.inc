@@ -1,4 +1,4 @@
-#include <YSI_Coding\y_hooks>
+#include <pp-hooks>
 
 hook OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 {
