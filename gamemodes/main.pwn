@@ -20,8 +20,10 @@
 #include "modules/animation/animation.inc"
 #include "modules/vehicle/vehicle.inc"
 #include "modules/time/time.inc"
+/*
 #include "modules/house/house.inc"
 #include "modules/company/company.inc"
+*/
 
 main()
 {
