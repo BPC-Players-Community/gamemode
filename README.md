@@ -29,18 +29,6 @@ Em breve.
 
 ---
 
-## ⭐ Características
-
-- Arquitetura modular
-- Código documentado
-- Compatível com open.mp
-- Desenvolvimento open source
-- Suporte para PC e Android
-- Fácil criação de novos sistemas
-- Base otimizada para Roleplay
-
----
-
 ## 🚧 Status
 
 O projeto encontra-se em desenvolvimento.
@@ -58,51 +46,45 @@ O projeto encontra-se em desenvolvimento.
 - Payday
 - Comandos RP
 
-## 🗺 Roadmap
-
-- [x] Login
-- [x] Registro
-- [x] Banco
-- [x] Sistema Administrativo
-- [x] Chat Local
-- [x] Empresas
-- [ ] Inventário
-- [ ] Casas
-- [ ] Veículos
-- [ ] Facções
-- [ ] Economia
-- [ ] GPS
-- [ ] Celular
-
----
-
-## 📂 Estrutura
-
-```
-gamemode/
-│
-├── core/
-├── player/
-├── account/
-├── company/
-├── chat/
-├── jobs/
-├── bank/
-├── death/
-├── admin/
-├── includes/
-└── database/
-```
-
 ---
 
 ## 🛠 Dependências
 
-- open.mp
-- Pawn.CMD
-- streamer
-- easyDialog
-- sscanf
+Esta gamemode utiliza as seguintes bibliotecas e componentes:
+
+### 📦 Includes
+
+* open.mp
+* PawnPlus
+* Pawn.CMD
+* pp-hooks
+* y_unique
+* streamer
+* easyDialog
+* sscanf2
+* foreach
+* a_mysql
+* whirlpool
+* WeatherSystem
+* gametext_plus
+* mSelection
+
+> **Observação:** todas as includes necessárias já estão incluídas neste repositório. Não é necessário baixá-las separadamente.
+
+### 🔌 Plugins
+
+Os seguintes plugins devem ser instalados na pasta `plugins` do servidor:
+
+* **streamer** — https://github.com/samp-incognito/samp-streamer-plugin/releases
+* **sscanf2** — https://github.com/Y-Less/sscanf/releases
+* **whirlpool** — https://github.com/Southclaws/samp-whirlpool/releases
+* **PawnPlus** — https://github.com/IS4Code/PawnPlus/releases
+
+### ⚙️ Components
+
+Os componentes abaixo também são necessários:
+
+* **Pawn.CMD** — https://github.com/katursis/Pawn.CMD/releases
 
 ---
 
