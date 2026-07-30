@@ -1,3 +1,8 @@
+#if defined _INC_account_dialogs
+	#endinput
+#endif
+#define _INC_account_dialogs
+
 stock ShowLoginDialog(playerid, const message[])
 {
     Dialog_Show(playerid, "Login", DIALOG_STYLE_PASSWORD, "Login", message, "Entrar", "Sair");
@@ -25,13 +30,13 @@ Dialog:Login(playerid, response, listitem, inputtext[])
 
     if (strlen(inputtext) == 0) {
         ShowLoginDialog(
-            playerid, 
+            playerid,
             "Voce precisa digitar uma senha.\nDigite sua senha para entrar:"
         );
         return 1;
     }
 
-    ValidatePlayerPassword(playerid, inputtext);
+    ValidateAccountPassword(playerid, inputtext);
     return 1;
 }
 
@@ -44,7 +49,7 @@ Dialog:Registro(playerid, response, listitem, inputtext[])
 
     if (strlen(inputtext) < MIN_PASSWORD_LEN) {
         ShowRegisterDialog(
-            playerid, 
+            playerid,
             "A senha deve ter pelo menos 4 caracteres.\nDigite uma senha para criar sua conta:"
         );
         return 1;
@@ -67,10 +72,10 @@ Dialog:RegistroConfirmar(playerid, response, listitem, inputtext[])
     HashPlayerPassword(playerid, inputtext, hash);
 
     if (!strcmp(hash, s_AccountPasswordHash[playerid])) {
-        CreatePlayerAccount(playerid);
+        CreateAccount(playerid);
     } else {
         ShowRegisterDialog(
-            playerid, 
+            playerid,
             "As senhas nao coincidem.\nDigite uma senha para criar sua conta:"
         );
     }
