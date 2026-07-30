@@ -18,21 +18,15 @@ static s_LoginBlockData[MAX_PLAYERS][e_LOGIN_BLOCK_DATA];
 
 stock LoginBlockCheck(playerid)
 {
-    printf("2 - LoginBlockCheck");
     new ipHash[HASH_LEN];
     new query[512];
 
     HashPlayerIp(playerid, ipHash);
-    printf("[IP HASH] '%s'", ipHash);
-    printf("[QUERY] %s", query);
-
+    
     mysql_format(GetDatabaseHandle(), query, sizeof(query),
         "SELECT `attempts`, `blocked_until` FROM `login_blocks` WHERE `ip_hash` = '%e' LIMIT 1",
         ipHash
     );
-
-    printf("[MYSQL] Handle: %d", _:GetDatabaseHandle());
-    printf("[MYSQL] Errno: %d", mysql_errno(GetDatabaseHandle()));
 
     mysql_tquery(GetDatabaseHandle(), query, "OnLoginBlockLoadResult", "d", playerid);
     return 1;
@@ -41,7 +35,6 @@ stock LoginBlockCheck(playerid)
 forward OnLoginBlockLoadResult(playerid);
 public OnLoginBlockLoadResult(playerid)
 {
-    printf("3 - OnLoginBlockLoadResult");
     if (!IsPlayerConnected(playerid)) {
         return 1;
     }
