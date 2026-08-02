@@ -49,5 +49,4 @@ stock DisconnectFromDatabase()
 hook OnGameModeInit()
 {
     ConnectToDatabase();
-    return 1;
 }

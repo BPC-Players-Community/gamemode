@@ -486,7 +486,7 @@ CMD:aa(playerid, params[])
 		EMBED_CANARY"Moderador"\
 		EMBED_WHITE"\n/kick, /setarskin, /congelar, /descongelar, /criarveh\n"\
 		EMBED_RED"Administrador"\
-		EMBED_WHITE"\n/ban, /setartempo, /setarclima, /dardinheiro, /definirlevel, /forcarpayday\n", 
+		EMBED_WHITE"\n/ban, /setartempo, /setarclima, /dardinheiro, /definirlevel, /forcarpayday, /acasa\n", 
 		"", ""
 	);
 	return 1;

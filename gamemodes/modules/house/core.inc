@@ -24,21 +24,28 @@ new p[MAX_PLAYERS][pInfo];
 
 enum cInfo
 {
+    cSqlID,
+
     cDono[24],
     Float:cX,
     Float:cY,
     Float:cZ,
+
     cTemDono,
     cTrancada,
+
     cIcone,
     cPickup,
+
     cInt,
+
     Text3D:cText,
+
     cPreco
 };
-new c[MAX_HOUSES][cInfo], TOTALCASA;
+new c[MAX_HOUSES][cInfo];
+new TOTALCASA;
 
-// interiores casas
 enum inter
 {
     Float:iX,
@@ -74,7 +81,6 @@ hook OnGameModeInit()
     print("-------------------------------------\n");
     ConectarDB();
     CarregarCasas();
-    return 1;
 }
 
 hook OnGameModeExit()
@@ -84,15 +90,13 @@ hook OnGameModeExit()
         DestroyDynamicPickup(c[i][cPickup]);
         DestroyDynamicMapIcon(c[i][cIcone]);
         DestroyDynamic3DTextLabel(c[i][cText]);
-    }    
-    return 1;
+    }
 }
 
 hook OnPlayerConnect(playerid)
 {
     GetPlayerName(playerid, p[playerid][Nome], 24);
     CarregarDadosPlayer(playerid);
-    return 1;
 }
 
 hook OnPlayerDisconnect(playerid, reason)
@@ -100,7 +104,6 @@ hook OnPlayerDisconnect(playerid, reason)
     if (p[playerid][TemCasa] > 0) {
         SalvarDadosPlayer(playerid);
     }
-    return 1;
 }
 
 hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
@@ -124,7 +127,7 @@ hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
                 if (c[i][cTemDono] == 1) {
                     if (c[i][cTrancada] == 1 && p[playerid][TemCasa] != i) {
                         SendClientMessage(playerid, COLOR_RED, "Casa trancada.");
-                        return 1;
+                        return;
                     }
                     
                     if (p[playerid][TemCasa] == i) {
@@ -141,7 +144,7 @@ hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
                         break;
                     } else {
                         SendClientMessage(playerid, COLOR_RED, "Essa casa nao eh sua.");
-                        return 1;
+                        return;
                     }
                 }
             }
@@ -155,7 +158,6 @@ hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
             p[playerid][EntrouCasa] = 0;
         }
     }
-    return 1;
 }
 
 // ============== DATA 
@@ -172,7 +174,7 @@ ConectarDB()
     }
     //criar a db esta em db.txt
     new Query[280];
-    format(Query, sizeof(Query), "CREATE TABLE IF NOT EXISTS CASAS(ID INTEGER PRIMARY KEY AUTOINCREMENT,\
+    format(Query, sizeof(Query), "CREATE TABLE IF NOT EXISTS CASAS(ID INTEGER PRIMARY KEY,\
     DONO TEXT DEFAULT '',\
     X FLOAT DEFAULT 0.0,\
     Y FLOAT DEFAULT 0.0,\
@@ -182,10 +184,11 @@ ConectarDB()
     TEMDONO INTEGER DEFAULT 0,\
     PRECO INTEGER DEFAULT 0)");    
     DB_ExecuteQuery(Database, Query);
-    format(Query, sizeof(Query), "CREATE TABLE IF NOT EXISTS DONOS(ID INTEGER PRIMARY KEY AUTOINCREMENT, NOME TEXT DEFAULT '', CASAID INTEGER DEFAULT 0)");    
+    format(Query, sizeof(Query), "CREATE TABLE IF NOT EXISTS DONOS(ID INTEGER PRIMARY KEY, NOME TEXT DEFAULT '', CASAID INTEGER DEFAULT 0)");    
     DB_ExecuteQuery(Database, Query);
     return 1;
 }
+
 CarregarDadosPlayer(playerid)
 {
     new DBResult:Result, Query[65];
@@ -203,6 +206,7 @@ CarregarDadosPlayer(playerid)
     DB_FreeResultSet(Result);
     return 1;
 }
+
 SalvarDadosPlayer(playerid)
 {
     new Query[75];
@@ -210,146 +214,242 @@ SalvarDadosPlayer(playerid)
     DB_ExecuteQuery(Database, Query); 
     return 1;
 }
-// ============== INIT
+
 CarregarCasas()
 {
-    new DBResult:Result, Query[50];
-    for(new i = 0; i < MAX_HOUSES; i++)
+    new DBResult:result;
+
+    result = DB_ExecuteQuery(Database,
+        "SELECT * FROM CASAS");
+
+    if(result == DBResult:0)
     {
-        format(Query, sizeof(Query), "SELECT * FROM CASAS WHERE ID = %d", i);
-        Result = DB_ExecuteQuery(Database, Query);
-        if(DB_GetRowCount(Result))
-        {
-            DB_GetFieldStringByName(Result, "DONO", c[i][cDono], 24);
-            c[i][cX] = DB_GetFieldFloatByName(Result, "X");
-            c[i][cY] = DB_GetFieldFloatByName(Result, "Y");
-            c[i][cZ] = DB_GetFieldFloatByName(Result, "Z");
-            c[i][cTemDono] = DB_GetFieldIntByName(Result, "TEMDONO");
-            c[i][cPreco] = DB_GetFieldIntByName(Result, "PRECO");
-            c[i][cInt] = DB_GetFieldIntByName(Result, "INTERIOR");
-            c[i][cTrancada] = DB_GetFieldIntByName(Result, "TRANCADA");
-            TOTALCASA ++;
-            CriarCasa(i);
-        }
-        DB_FreeResultSet(Result);
+        print("[HOUSE] Erro ao carregar casas.");
+        return 0;
     }
-    printf("\nCasas carregadas: %d", TOTALCASA);
+
+    TOTALCASA = 0;
+
+    while(DB_SelectNextRow(result))
+    {
+        new id;
+
+        id = DB_GetFieldIntByName(result, "ID");
+
+        if(id < 0 || id >= MAX_HOUSES)
+            continue;
+
+        DB_GetFieldStringByName(result,
+            "DONO",
+            c[id][cDono],
+            24);
+
+        c[id][cX] = DB_GetFieldFloatByName(result, "X");
+        c[id][cY] = DB_GetFieldFloatByName(result, "Y");
+        c[id][cZ] = DB_GetFieldFloatByName(result, "Z");
+
+        c[id][cTemDono] =
+            DB_GetFieldIntByName(result, "TEMDONO");
+
+        c[id][cTrancada] =
+            DB_GetFieldIntByName(result, "TRANCADA");
+
+        c[id][cPreco] =
+            DB_GetFieldIntByName(result, "PRECO");
+
+        c[id][cInt] =
+            DB_GetFieldIntByName(result, "INTERIOR");
+
+        CriarCasa(id);
+
+        TOTALCASA++;
+    }
+
+    DB_FreeResultSet(result);
+
+    printf("[HOUSE] Casas carregadas: %d", TOTALCASA);
+
     return 1;
 }
-CriarCasa(i)
+
+CriarCasa(slot)
 {
+    if (c[slot][cX] == 0.0 &&
+       c[slot][cY] == 0.0 &&
+       c[slot][cZ] == 0.0)
+    {
+        printf("[HOUSE] Casa %d possui coordenadas inválidas.", slot);
+        return 0;
+    }
+
     new texto[200];
-    if(c[i][cTemDono] == 0)
-    {
-        c[i][cIcone] = CreateDynamicMapIcon(c[i][cX], c[i][cY], c[i][cZ], 31, -1);
-        c[i][cPickup] = CreateDynamicPickup(1273, 21, c[i][cX], c[i][cY], c[i][cZ]);
-        format(texto, sizeof(texto), "{2E8B57}CASA ID: {FFFFFF}%d\n{3CB371}Dono: {FFFFFF}%s\n{3CB371}Preзo: {FFFFFF}$ %d\n{3CB371}Aperte 'F' para entrar\n/ajudacasa", i, c[i][cDono], c[i][cPreco]);
-        c[i][cText] = CreateDynamic3DTextLabel(texto, 0xFFFFFFAA, c[i][cX], c[i][cY], c[i][cZ]+1, 20);
+    if (c[slot][cTemDono] == 0) {
+        c[slot][cIcone] = CreateDynamicMapIcon(c[slot][cX], c[slot][cY], c[slot][cZ], 31, -1);
+        c[slot][cPickup] = CreateDynamicPickup(1273, 21, c[slot][cX], c[slot][cY], c[slot][cZ]);
+        format(texto, sizeof(texto), "{2E8B57}CASA ID: {FFFFFF}%d\n{3CB371}Dono: {FFFFFF}%s\n{3CB371}Preзo: {FFFFFF}$ %d\n{3CB371}Aperte 'F' para entrar\n/ajudacasa", slot, c[slot][cDono], c[slot][cPreco]);
+        c[slot][cText] = CreateDynamic3DTextLabel(texto, 0xFFFFFFAA, c[slot][cX], c[slot][cY], c[slot][cZ]+1, 20);
+    } else if (c[slot][cTemDono] == 1) {
+        c[slot][cIcone] = CreateDynamicMapIcon(c[slot][cX], c[slot][cY], c[slot][cZ], 32, -1);
+        c[slot][cPickup] = CreateDynamicPickup(19522, 21, c[slot][cX], c[slot][cY], c[slot][cZ]);//1272
+        format(texto, sizeof(texto), "{B22222}CASA ID: {FFFFFF}%d\n{CD5C5C}Dono: {FFFFFF}%s\n{CD5C5C}Preзo: {FFFFFF}$ %d{CD5C5C}\n/ajudacasa", slot, c[slot][cDono], c[slot][cPreco]);
+        c[slot][cText] = CreateDynamic3DTextLabel(texto, 0xFFFFFFAA, c[slot][cX], c[slot][cY], c[slot][cZ]+1, 20);
     }
-    else if(c[i][cTemDono] == 1)
-    {
-        c[i][cIcone] = CreateDynamicMapIcon(c[i][cX], c[i][cY], c[i][cZ], 32, -1);
-        c[i][cPickup] = CreateDynamicPickup(19522, 21, c[i][cX], c[i][cY], c[i][cZ]);//1272
-        format(texto, sizeof(texto), "{B22222}CASA ID: {FFFFFF}%d\n{CD5C5C}Dono: {FFFFFF}%s\n{CD5C5C}Preзo: {FFFFFF}$ %d{CD5C5C}\n/ajudacasa", i, c[i][cDono], c[i][cPreco]);
-        c[i][cText] = CreateDynamic3DTextLabel(texto, 0xFFFFFFAA, c[i][cX], c[i][cY], c[i][cZ]+1, 20);
-    }
+    
+    printf(
+        "[HOUSE] Casa %d criada. Pickup=%d Icon=%d",
+        slot,
+        c[slot][cPickup],
+        c[slot][cIcone]);
+
     return 1;
 }
-// ============== ADMIN
-Criar_Casa(playerid, id, preco, inte)
+
+Criar_Casa(playerid, id, preco, interior)
 {
-    new DBResult:Result, Query[160];
-    format(Query, sizeof(Query), "SELECT * FROM CASAS WHERE ID = %d", id);
-    Result = DB_ExecuteQuery(Database, Query);
-    if(DB_GetRowCount(Result))
+    if(id < 0 || id >= MAX_HOUSES)
     {
-        SendClientMessage(playerid, COLOR_RED, "Ocorreu um erro. Esse ID esta em uso.");
-        } else {
-        new Float:Pos[3];
-        GetPlayerPos(playerid, Pos[0], Pos[1], Pos[2]);
-        format(c[id][cDono], 24, "Nenhum");
-        c[id][cX] = Pos[0];
-        c[id][cY] = Pos[1];
-        c[id][cZ] = Pos[2];
-        c[id][cTemDono] = 0;
-        c[id][cPreco] = preco;
-        c[id][cInt] = inte;
-        SendClientMessage(playerid, COLOR_ORANGE, "Casa criada com sucesso.");
-        CriarCasa(id);
-        format(Query, sizeof(Query), "INSERT INTO CASAS(DONO, X, Y, Z, PRECO, INTERIOR) VALUES ('%s', %f, %f, %f, %d, %d)", c[id][cDono], c[id][cX], c[id][cY], c[id][cZ], c[id][cPreco], c[id][cInt]);
-        DB_ExecuteQuery(Database, Query);
-        TOTALCASA ++;
+        SendClientMessage(playerid, COLOR_RED, "ID invalido.");
+        return 1;
     }
-    DB_FreeResultSet(Result);
+
+    new DBResult:result;
+    new query[256];
+
+    format(query, sizeof(query),
+        "SELECT * FROM CASAS WHERE ID=%d",
+        id);
+
+    result = DB_ExecuteQuery(Database, query);
+
+    if(DB_GetRowCount(result))
+    {
+        DB_FreeResultSet(result);
+        SendClientMessage(playerid, COLOR_RED, "Esse ID ja existe.");
+        return 1;
+    }
+
+    DB_FreeResultSet(result);
+
+    GetPlayerPos(playerid,
+        c[id][cX],
+        c[id][cY],
+        c[id][cZ]);
+
+    format(c[id][cDono], 24, "Nenhum");
+
+    c[id][cTemDono]  = 0;
+    c[id][cTrancada] = 0;
+    c[id][cPreco]    = preco;
+    c[id][cInt]      = interior;
+
+    format(query,sizeof(query),
+        "INSERT INTO CASAS \
+        (ID,DONO,X,Y,Z,INTERIOR,TRANCADA,TEMDONO,PRECO) \
+        VALUES \
+        (%d,'%s',%f,%f,%f,%d,%d,%d,%d)",
+        id,
+        c[id][cDono],
+        c[id][cX],
+        c[id][cY],
+        c[id][cZ],
+        c[id][cInt],
+        c[id][cTrancada],
+        c[id][cTemDono],
+        c[id][cPreco]);
+
+    DB_ExecuteQuery(Database, query);
+
+    CriarCasa(id);
+
+    TOTALCASA++;
+
+    SendClientMessage(playerid,
+        COLOR_ORANGE,
+        "Casa criada com sucesso.");
+
     return 1;
 }
-Editar_Casa(playerid, id, preco, interi)
+
+Editar_Casa(playerid, id, preco, interior)
 {
-    new DBResult:Result, Query[50];
-    format(Query, sizeof(Query), "SELECT * FROM CASAS WHERE ID = %d", id);
-    Result = DB_ExecuteQuery(Database, Query);
-    if(DB_GetRowCount(Result))
-    {
-        new string[60];
-        format(string, sizeof(string), "Vocк editou a casa id %d com sucesso!", id);
-        SendClientMessage(playerid, COLOR_ORANGE, string);    
-        c[id][cPreco] = preco;
-        c[id][cInt] = interi;
-        DestroyDynamicPickup(c[id][cPickup]);
-        DestroyDynamicMapIcon(c[id][cIcone]);
-        DestroyDynamic3DTextLabel(c[id][cText]);
-        CriarCasa(id);
-        } else {
-        SendClientMessage(playerid, COLOR_RED, "Ocorreu um erro. Esse ID nгo existe.");
-    }
-    DB_FreeResultSet(Result);
+    if(id < 0 || id >= MAX_HOUSES)
+        return 0;
+
+    c[id][cPreco] = preco;
+    c[id][cInt]   = interior;
+
+    new query[128];
+
+    format(query,sizeof(query),
+        "UPDATE CASAS SET PRECO=%d, INTERIOR=%d WHERE ID=%d",
+        preco,
+        interior,
+        id);
+
+    DB_ExecuteQuery(Database,query);
+
+    DestroyDynamicPickup(c[id][cPickup]);
+    DestroyDynamicMapIcon(c[id][cIcone]);
+    DestroyDynamic3DTextLabel(c[id][cText]);
+
+    CriarCasa(id);
+
+    SendClientMessage(playerid,
+        COLOR_ORANGE,
+        "Casa editada.");
+
     return 1;
 }
-Ir_Casa(playerid, id)
+
+Ir_Casa(playerid, slot)
 {
-    new DBResult:Result, Query[50];
-    format(Query, sizeof(Query), "SELECT * FROM CASAS WHERE ID = %d", id);
-    Result = DB_ExecuteQuery(Database, Query);
-    if(DB_GetRowCount(Result))
-    {
-        new string[60];
-        format(string, sizeof(string), "Vocк foi a casa id %d.", id);
-        SendClientMessage(playerid, COLOR_ORANGE, string);    
-        SetPlayerPos(playerid, c[id][cX], c[id][cY], c[id][cZ]);
-        SetPlayerInterior(playerid, 0);
-        } else {
-        SendClientMessage(playerid, COLOR_RED, "Ocorreu um erro. Esse ID nгo existe.");
-    }
-    DB_FreeResultSet(Result);
+    if(slot < 0 || slot >= TOTALCASA)
+        return 0;
+
+    SetPlayerPos(
+        playerid,
+        c[slot][cX],
+        c[slot][cY],
+        c[slot][cZ]);
+
+    SetPlayerInterior(playerid,0);
+
     return 1;
 }
+
 Deletar_Casa(playerid, id)
 {
-    new DBResult:Result, Query[50];
-    format(Query, sizeof(Query), "SELECT * FROM CASAS WHERE ID = %d", id);
-    Result = DB_ExecuteQuery(Database, Query);
-    if(DB_GetRowCount(Result))
-    {
-        format(Query, sizeof(Query), "DELETE FROM CASAS WHERE ID = %d", id);
-        DB_ExecuteQuery(Database, Query);
-        new string[60];
-        format(string, sizeof(string), "Vocк excluiu a casa id %d com sucesso!", id);
-        SendClientMessage(playerid, COLOR_ORANGE, string);    
-        format(c[id][cDono], 24, "Nenhum");
-        c[id][cX] = -1;
-        c[id][cY] = -1;
-        c[id][cZ] = -1;
-        c[id][cTemDono] = -1;
-        c[id][cPreco] = -1;
-        c[id][cInt] = -1;
-        c[id][cTrancada] = -1;
-        DestroyDynamicPickup(c[id][cPickup]);
-        DestroyDynamicMapIcon(c[id][cIcone]);
-        DestroyDynamic3DTextLabel(c[id][cText]);
-        TOTALCASA --;
-        } else {
-        SendClientMessage(playerid, COLOR_RED, "Ocorreu um erro. Esse ID nгo existe.");
-    }
-    DB_FreeResultSet(Result);
+    if(id < 0 || id >= MAX_HOUSES)
+        return 0;
+
+    new query[64];
+
+    format(query,sizeof(query),
+        "DELETE FROM CASAS WHERE ID=%d",
+        id);
+
+    DB_ExecuteQuery(Database,query);
+
+    DestroyDynamicPickup(c[id][cPickup]);
+    DestroyDynamicMapIcon(c[id][cIcone]);
+    DestroyDynamic3DTextLabel(c[id][cText]);
+
+    c[id][cX] = 0.0;
+    c[id][cY] = 0.0;
+    c[id][cZ] = 0.0;
+
+    c[id][cPreco] = 0;
+    c[id][cTemDono] = 0;
+    c[id][cTrancada] = 0;
+    c[id][cInt] = 0;
+
+    format(c[id][cDono],24,"");
+
+    TOTALCASA--;
+
+    SendClientMessage(playerid,
+        COLOR_ORANGE,
+        "Casa removida.");
+
     return 1;
 }
