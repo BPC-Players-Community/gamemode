@@ -52,7 +52,7 @@ datagram.inc
 file.inc
 float.inc
 string.inc
-time.inc
+qawno/include/time.inc
 args.inc
 camera-sequencer.inc
 CameraMover.inc
