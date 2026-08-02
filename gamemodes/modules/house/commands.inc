@@ -10,49 +10,42 @@
 #endif
 #define _INC_house_commands
 
-CMD:acasa(playerid)
-{
-    if(!IsPlayerAdmin(playerid)) return SendClientMessage(playerid, COLOR_RED, "Comando restrito a administradores.");
-    new String_COMANDOS[220]; //
-    format(String_COMANDOS, sizeof String_COMANDOS, "");
-    
-    strcat(String_COMANDOS, "{009900}ADMIN C-CASAS\n\n"); 
-    strcat(String_COMANDOS, "{CECECE}/criarcasa {FFFFFF}- Criar uma casa.\n");
-    strcat(String_COMANDOS, "{CECECE}/editarcasa {FFFFFF}- Editar uma casa.\n");
-    strcat(String_COMANDOS, "{CECECE}/deletarcasa {FFFFFF}- Deletar casa.\n");
-    strcat(String_COMANDOS, "{CECECE}/ircasa {FFFFFF}- Ir a uma casa.\n");
-    ShowPlayerDialog(playerid, 9545, DIALOG_STYLE_MSGBOX, "Comandos Admin C-Casas", String_COMANDOS, "Ok", "");
-    return 1;
-}
-
 CMD:criarcasa(playerid, params[])
 {
-    if(!IsPlayerAdmin(playerid)) return SendClientMessage(playerid, COLOR_RED, "Comando restrito a administradores.");
-    if(sscanf(params, "ii", params[0], params[1])) return SendClientMessage(playerid, COLOR_GRAY, "Use /criarcasa [preco] [int 0a10]");
+    if (sscanf(params, "ii", params[0], params[1])) {
+        SendClientMessage(playerid, COLOR_GRAY, "Use /criarcasa [preco] [int 0a10]");
+        return 1;
+    }
     Criar_Casa(playerid, TOTALCASA+1, params[0], params[1]);
     return 1;
 }
 
 CMD:ircasa(playerid, params[])
 {
-    if(!IsPlayerAdmin(playerid)) return SendClientMessage(playerid, COLOR_RED, "Comando restrito a administradores.");
-    if(sscanf(params, "i", params[0])) return SendClientMessage(playerid, COLOR_GRAY, "Use /ircasa [id]");
+    if (sscanf(params, "i", params[0])) {
+        SendClientMessage(playerid, COLOR_GRAY, "Use /ircasa [id]");
+        return 1;
+    }
     Ir_Casa(playerid, params[0]);
     return 1;
 }
 
 CMD:editarcasa(playerid, params[])
 {
-    if(!IsPlayerAdmin(playerid)) return SendClientMessage(playerid, COLOR_RED, "Comando restrito a administradores.");
-    if(sscanf(params, "iii", params[0], params[1], params[2])) return SendClientMessage(playerid, COLOR_GRAY, "Use /editarcasa [id] [preco] [int 0a10]");
+    if (sscanf(params, "iii", params[0], params[1], params[2])) {
+        SendClientMessage(playerid, COLOR_GRAY, "Use /editarcasa [id] [preco] [int 0a10]");
+        return 1;
+    }
     Editar_Casa(playerid, params[0], params[1], params[2]);
     return 1;
 }
 
 CMD:deletarcasa(playerid, params[])
 {
-    if(!IsPlayerAdmin(playerid)) return SendClientMessage(playerid, COLOR_RED, "Comando restrito a administradores.");
-    if(sscanf(params, "i", params[0])) return SendClientMessage(playerid, COLOR_GRAY, "Use /deletarcasa [id]");
+    if (sscanf(params, "i", params[0])) {
+        SendClientMessage(playerid, COLOR_GRAY, "Use /deletarcasa [id]");
+        return 1;
+    }
     Deletar_Casa(playerid, params[0]);
     return 1;
 }
@@ -127,9 +120,9 @@ CMD:vendercasa(playerid)
 
 CMD:trancar(playerid)
 {
-    for(new i = 0; i < MAX_HOUSES; i++)
+    for (new i = 0; i < MAX_HOUSES; i++)
     {
-        if(IsPlayerInRangeOfPoint(playerid, 1, c[i][cX], c[i][cY], c[i][cZ]))
+        if (IsPlayerInRangeOfPoint(playerid, 1, c[i][cX], c[i][cY], c[i][cZ]))
         {
             if(p[playerid][TemCasa] == 0) return SendClientMessage(playerid, COLOR_RED, "Vocк nгo possue uma casa.");
             if(c[i][cTemDono] == 0) return SendClientMessage(playerid, COLOR_RED, "Essa casa nгo possue dono.");
@@ -165,6 +158,27 @@ CMD:trancar(playerid)
 
 CMD:ajudacasa(playerid)
 {
-    ShowPlayerDialog(playerid, 9595, DIALOG_STYLE_MSGBOX, "Ajuda C-Casas","{009900}CASAS\n\n{CECECE}/comprarcasa {FFFFFF}- Comprar uma casa.\n{CECECE}/vendercasa {FFFFFF}- Vender sua casa.\n{CECECE}/trancar {FFFFFF}- trancar | destrancar casa.\n", "Ok", "");
+    Dialog_Show(playerid, "Comandos Casas",
+        DIALOG_STYLE_MSGBOX, 
+        "Informacao | "EMBED_RED" Comandos Casas",    
+        "{CECECE}/comprarcasa {FFFFFF}- Comprar uma casa.\
+        \n{CECECE}/vendercasa {FFFFFF}- Vender sua casa.\
+        \n{CECECE}/trancar {FFFFFF}- trancar | destrancar casa.\n",
+        "", ""
+    );
+    return 1;
+}
+
+CMD:acasa(playerid)
+{
+    new String_COMANDOS[220];
+    format(String_COMANDOS, sizeof String_COMANDOS, "");
+    
+    strcat(String_COMANDOS, "{009900}ADMIN C-CASAS\n\n"); 
+    strcat(String_COMANDOS, "{CECECE}/criarcasa {FFFFFF}- Criar uma casa.\n");
+    strcat(String_COMANDOS, "{CECECE}/editarcasa {FFFFFF}- Editar uma casa.\n");
+    strcat(String_COMANDOS, "{CECECE}/deletarcasa {FFFFFF}- Deletar casa.\n");
+    strcat(String_COMANDOS, "{CECECE}/ircasa {FFFFFF}- Ir a uma casa.\n");
+    ShowPlayerDialog(playerid, 9545, DIALOG_STYLE_MSGBOX, "Comandos Admin C-Casas", String_COMANDOS, "Ok", "");
     return 1;
 }
