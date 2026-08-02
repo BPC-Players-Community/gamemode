@@ -12,11 +12,14 @@
 
 CMD:criarcasa(playerid, params[])
 {
-    if (sscanf(params, "ii", params[0], params[1])) {
-        SendClientMessage(playerid, COLOR_GRAY, "Use /criarcasa [preco] [int 0a10]");
+    new houseid;
+    new houseprice;
+    new interiorid;
+    if (sscanf(params, "iii", houseid, houseprice, interiorid)) {
+        SendClientMessage(playerid, COLOR_GRAY, "Use /criarcasa <id> <preco> <interior 0-10>");
         return 1;
     }
-    Criar_Casa(playerid, TOTALCASA+1, params[0], params[1]);
+    Criar_Casa(playerid, houseid, houseprice, interiorid);
     return 1;
 }
 
