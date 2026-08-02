@@ -5,15 +5,14 @@
     Todos os direitos reservados. 02/05/2018*
     Link: https://sampforum.blast.hk/showthread.php?tid=653371
 */
+#if defined _INC_house_core
+	#endinput
+#endif
+#define _INC_house_core
 
-#include <YSI_Coding\y_hooks>
+#include <pp-hooks>
 
-enum {
-    MAX_CASAS = 100, // Maximo de casas
-    VERMELHO = 0xFF000FFF,
-    CINZA = 0xCECECEFF,
-    LARANJA = 0xF97804FF
-};
+#define MAX_HOUSES (100)
 
 enum pInfo
 {
@@ -37,7 +36,7 @@ enum cInfo
     Text3D:cText,
     cPreco
 };
-new c[MAX_CASAS][cInfo], TOTALCASA;
+new c[MAX_HOUSES][cInfo], TOTALCASA;
 
 // interiores casas
 enum inter
@@ -49,7 +48,7 @@ enum inter
     iID
 }
 
-new interior[][inter] =
+new interiors[][inter] =
 {
     {2196.84, -1204.36, 1049.02, 94.0010, 6},
     {2259.38, -1135.89, 1050.64, 275.3992, 10},
@@ -75,15 +74,13 @@ hook OnGameModeInit()
     print("-------------------------------------\n");
     ConectarDB();
     CarregarCasas();
-    EnableStuntBonusForAll(false);
-    DisableInteriorEnterExits();
     return 1;
 }
 
 hook OnGameModeExit()
 {
     DB_Close(Database);
-    for(new i = 0; i < MAX_CASAS; ++i) {
+    for (new i = 0; i < MAX_HOUSES; ++i) {
         DestroyDynamicPickup(c[i][cPickup]);
         DestroyDynamicMapIcon(c[i][cIcone]);
         DestroyDynamic3DTextLabel(c[i][cText]);
@@ -100,48 +97,50 @@ hook OnPlayerConnect(playerid)
 
 hook OnPlayerDisconnect(playerid, reason)
 {
-    if (p[playerid][TemCasa] > 0) SalvarDadosPlayer(playerid);
+    if (p[playerid][TemCasa] > 0) {
+        SalvarDadosPlayer(playerid);
+    }
     return 1;
 }
 
 hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
 {
     if (newkeys == KEY_SECONDARY_ATTACK) {
-        for (new i = 0; i < MAX_CASAS; i++) {
+        for (new i = 0; i < MAX_HOUSES; i++) {
             if (IsPlayerInRangeOfPoint(playerid, 1, c[i][cX], c[i][cY], c[i][cZ])) {
                 if(c[i][cTemDono] == 0) {
-                    SetPlayerPos(playerid, interior[c[i][cInt]][iX], interior[c[i][cInt]][iY], interior[c[i][cInt]][iZ]);
-                    SetPlayerFacingAngle(playerid, interior[c[i][cInt]][iA]);
-                    SetPlayerInterior(playerid, interior[c[i][cInt]][iID]);
+                    SetPlayerPos(playerid, interiors[c[i][cInt]][iX], interiors[c[i][cInt]][iY], interiors[c[i][cInt]][iZ]);
+                    SetPlayerFacingAngle(playerid, interiors[c[i][cInt]][iA]);
+                    SetPlayerInterior(playerid, interiors[c[i][cInt]][iID]);
                     p[playerid][EntrouCasa] = i;
                     
                     SendClientMessage(
                         playerid,
-                        LARANJA,
+                        COLOR_ORANGE,
                         "Casa a venda! Para comprar use /comprarcasa no pickup de fora. Use 'N' para sair."
                     );
                     break;   
                 }
                 if (c[i][cTemDono] == 1) {
                     if (c[i][cTrancada] == 1 && p[playerid][TemCasa] != i) {
-                        SendClientMessage(playerid, VERMELHO, "Casa trancada.");
+                        SendClientMessage(playerid, COLOR_RED, "Casa trancada.");
                         return 1;
                     }
                     
                     if (p[playerid][TemCasa] == i) {
-                        SetPlayerPos(playerid, interior[c[i][cInt]][iX], interior[c[i][cInt]][iY], interior[c[i][cInt]][iZ]);
-                        SetPlayerFacingAngle(playerid, interior[c[i][cInt]][iA]);
-                        SetPlayerInterior(playerid, interior[c[i][cInt]][iID]);
+                        SetPlayerPos(playerid, interiors[c[i][cInt]][iX], interiors[c[i][cInt]][iY], interiors[c[i][cInt]][iZ]);
+                        SetPlayerFacingAngle(playerid, interiors[c[i][cInt]][iA]);
+                        SetPlayerInterior(playerid, interiors[c[i][cInt]][iID]);
                         p[playerid][EntrouCasa] = i;
                         
                         SendClientMessage(
                             playerid,
-                            LARANJA,
+                            COLOR_ORANGE,
                             "Bem vindo a sua casa. Use 'N' para sair."
                         );
                         break;
                     } else {
-                        SendClientMessage(playerid, VERMELHO, "Essa casa nao eh sua.");
+                        SendClientMessage(playerid, COLOR_RED, "Essa casa nao eh sua.");
                         return 1;
                     }
                 }
@@ -149,7 +148,7 @@ hook OnPlayerKeyStateChange(playerid, KEY:newkeys, KEY:oldkeys)
         }
     }
 
-    if (newkeys == 131072) {
+    if (newkeys == KEY_NO) {
         if (p[playerid][EntrouCasa] > 0) {
             SetPlayerPos(playerid, c[p[playerid][EntrouCasa]][cX], c[p[playerid][EntrouCasa]][cY], c[p[playerid][EntrouCasa]][cZ]);
             SetPlayerInterior(playerid, 0);
@@ -215,7 +214,7 @@ SalvarDadosPlayer(playerid)
 CarregarCasas()
 {
     new DBResult:Result, Query[50];
-    for(new i = 0; i < MAX_CASAS; i++)
+    for(new i = 0; i < MAX_HOUSES; i++)
     {
         format(Query, sizeof(Query), "SELECT * FROM CASAS WHERE ID = %d", i);
         Result = DB_ExecuteQuery(Database, Query);
@@ -264,7 +263,7 @@ Criar_Casa(playerid, id, preco, inte)
     Result = DB_ExecuteQuery(Database, Query);
     if(DB_GetRowCount(Result))
     {
-        SendClientMessage(playerid, VERMELHO, "Ocorreu um erro. Esse ID esta em uso.");
+        SendClientMessage(playerid, COLOR_RED, "Ocorreu um erro. Esse ID esta em uso.");
         } else {
         new Float:Pos[3];
         GetPlayerPos(playerid, Pos[0], Pos[1], Pos[2]);
@@ -275,7 +274,7 @@ Criar_Casa(playerid, id, preco, inte)
         c[id][cTemDono] = 0;
         c[id][cPreco] = preco;
         c[id][cInt] = inte;
-        SendClientMessage(playerid, LARANJA, "Casa criada com sucesso.");
+        SendClientMessage(playerid, COLOR_ORANGE, "Casa criada com sucesso.");
         CriarCasa(id);
         format(Query, sizeof(Query), "INSERT INTO CASAS(DONO, X, Y, Z, PRECO, INTERIOR) VALUES ('%s', %f, %f, %f, %d, %d)", c[id][cDono], c[id][cX], c[id][cY], c[id][cZ], c[id][cPreco], c[id][cInt]);
         DB_ExecuteQuery(Database, Query);
@@ -293,7 +292,7 @@ Editar_Casa(playerid, id, preco, interi)
     {
         new string[60];
         format(string, sizeof(string), "Vocк editou a casa id %d com sucesso!", id);
-        SendClientMessage(playerid, LARANJA, string);    
+        SendClientMessage(playerid, COLOR_ORANGE, string);    
         c[id][cPreco] = preco;
         c[id][cInt] = interi;
         DestroyDynamicPickup(c[id][cPickup]);
@@ -301,7 +300,7 @@ Editar_Casa(playerid, id, preco, interi)
         DestroyDynamic3DTextLabel(c[id][cText]);
         CriarCasa(id);
         } else {
-        SendClientMessage(playerid, VERMELHO, "Ocorreu um erro. Esse ID nгo existe.");
+        SendClientMessage(playerid, COLOR_RED, "Ocorreu um erro. Esse ID nгo existe.");
     }
     DB_FreeResultSet(Result);
     return 1;
@@ -315,11 +314,11 @@ Ir_Casa(playerid, id)
     {
         new string[60];
         format(string, sizeof(string), "Vocк foi a casa id %d.", id);
-        SendClientMessage(playerid, LARANJA, string);    
+        SendClientMessage(playerid, COLOR_ORANGE, string);    
         SetPlayerPos(playerid, c[id][cX], c[id][cY], c[id][cZ]);
         SetPlayerInterior(playerid, 0);
         } else {
-        SendClientMessage(playerid, VERMELHO, "Ocorreu um erro. Esse ID nгo existe.");
+        SendClientMessage(playerid, COLOR_RED, "Ocorreu um erro. Esse ID nгo existe.");
     }
     DB_FreeResultSet(Result);
     return 1;
@@ -335,7 +334,7 @@ Deletar_Casa(playerid, id)
         DB_ExecuteQuery(Database, Query);
         new string[60];
         format(string, sizeof(string), "Vocк excluiu a casa id %d com sucesso!", id);
-        SendClientMessage(playerid, LARANJA, string);    
+        SendClientMessage(playerid, COLOR_ORANGE, string);    
         format(c[id][cDono], 24, "Nenhum");
         c[id][cX] = -1;
         c[id][cY] = -1;
@@ -349,7 +348,7 @@ Deletar_Casa(playerid, id)
         DestroyDynamic3DTextLabel(c[id][cText]);
         TOTALCASA --;
         } else {
-        SendClientMessage(playerid, VERMELHO, "Ocorreu um erro. Esse ID nгo existe.");
+        SendClientMessage(playerid, COLOR_RED, "Ocorreu um erro. Esse ID nгo existe.");
     }
     DB_FreeResultSet(Result);
     return 1;
