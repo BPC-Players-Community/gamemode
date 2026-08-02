@@ -167,7 +167,7 @@ stock CreateCompany(id = 0)
     return 1;
 }
 
-hook OnPlayerPickUpDynamicPickup(playerid, STREAMER_TAG_PICKUP:pickupid)
+public OnPlayerPickUpDynamicPickup(playerid, STREAMER_TAG_PICKUP:pickupid)
 {
     new companyid = PickupEntity[_:pickupid][E_PICKUP_COMPANY];
 
