@@ -1,8 +1,19 @@
-#include <YSI_Coding\y_hooks>
+#if defined _INC_company_core
+	#endinput
+#endif
+#define _INC_company_core
+
+/* Alerta de fofura
+    Estou testando em hardcoded mesmo, 
+    pretendo carregar tudo via bando de dados
+
+*/
+
+#include <pp-hooks>
 
 #define MAX_COMPANIES          (1)
 
-enum E_COMPANY_DATA
+enum e_COMPANY_DATA
 {
     /*
     E_COMPANY_SQL_ID,
@@ -26,7 +37,7 @@ enum E_COMPANY_DATA
     E_COMPANY_EXIT_INTERIOR
 };
 
-new CompanyData[MAX_COMPANIES][E_COMPANY_DATA] = 
+new CompanyData[MAX_COMPANIES][e_COMPANY_DATA] = 
 {
     {
         "Binco", false,
@@ -52,7 +63,7 @@ CMD:saida(playerid)
     return 1;
 }
 
-enum E_ENTITY_TYPE
+enum e_ENTITY_TYPE
 {
     ENTITY_NONE,
 
@@ -79,10 +90,14 @@ new STREAMER_TAG_PICKUP:pickup;
 
 hook OnGameModeInit()
 {
-    CreateCompany();
+    if (CreateCompany()) {
+        printf("Empresa criada com sucesso");
+    } else {
+        printf("ERRO: Falha ao criar a empresa");
+    }
 }
 
-GetCompanyBusinessHour(companyid, &open, &close)
+stock GetCompanyBusinessHour(companyid, &open, &close)
 {
     open = CompanyData[companyid][E_COMPANY_OPEN];
     close = CompanyData[companyid][E_COMPANY_CLOSE];
@@ -97,13 +112,13 @@ CMD:horario(playerid)
     return 1;
 }
 
-SetCompanyLocked(companyid, bool:locked)
+stock SetCompanyLocked(companyid, bool:locked)
 {
     CompanyData[companyid][E_COMPANY_LOCKED] = locked;
     return 1;
 }
 
-IsCompanyLocked(companyid)
+stock IsCompanyLocked(companyid)
 {
     new open, close;
     GetCompanyBusinessHour(companyid, open, close);
@@ -125,12 +140,10 @@ stock CreateCompany(id = 0)
         CompanyData[id][E_COMPANY_ENTER_Y],
         CompanyData[id][E_COMPANY_ENTER_Z]
     );
-    if (!IsValidDynamicPickup(pickup))
-    {
+    if (!IsValidDynamicPickup(pickup)) {
         printf("ERRO: Falha ao criar o pickup de entrada");
     }
-    else
-    {
+    else {
         printf("Pickup criado: %d", _:pickup);
     }
 
@@ -144,16 +157,14 @@ stock CreateCompany(id = 0)
         CompanyData[id][E_COMPANY_EXIT_Y],
         CompanyData[id][E_COMPANY_EXIT_Z]
     );
-    if (!IsValidDynamicPickup(pickup))
-    {
+    if (!IsValidDynamicPickup(pickup)) {
         printf("ERRO: Falha ao criar o pickup de entrada");
-    }
-    else
-    {
+    } else {
         printf("Pickup criado: %d", _:pickup);
     }
     PickupEntity[_:pickup][E_PICKUP_COMPANY] = id;
     PickupEntity[_:pickup][E_PICKUP_TYPE] = ENTITY_COMPANY_EXIT_PICKUP;
+    return 1;
 }
 
 public OnPlayerPickUpDynamicPickup(playerid, STREAMER_TAG_PICKUP:pickupid)
@@ -162,7 +173,6 @@ public OnPlayerPickUpDynamicPickup(playerid, STREAMER_TAG_PICKUP:pickupid)
 
     switch (PickupEntity[_:pickupid][E_PICKUP_TYPE]) {
         case ENTITY_COMPANY_ENTER_PICKUP: {
-
             if (IsCompanyLocked(companyid)) {
                 SendClientMessage(playerid, -1, "A empresa esta trancada.");
                 return 1;

@@ -22,12 +22,22 @@
 #include "modules/time/time.inc"
 #include "modules/commands/commands.inc"
 #include "modules/admin/admin.inc"
-/*
 #include "modules/house/house.inc"
 #include "modules/company/company.inc"
-*/
+
+public OnGameModeInit()
+{
+    print("Gamemode initialized successfully.");
+    return 1;
+}
+
+public OnGameModeExit()
+{
+    print("Gamemode unloaded successfully.");
+    return 1;
+}
 
 main()
 {
-
+    print("Gamemode loaded successfully.");
 }

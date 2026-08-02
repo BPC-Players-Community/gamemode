@@ -1,3 +1,8 @@
+#if defined _INC_core
+	#endinput
+#endif
+#define _INC_time_core
+
 #include <pp-hooks>
 
 #define TIMER_INTERVAL      1000
