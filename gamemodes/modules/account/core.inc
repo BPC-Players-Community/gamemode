@@ -246,7 +246,6 @@ hook OnGameModeExit()
     }
 
     DisconnectFromDatabase();
-    return 1;
 }
 
 hook OnPlayerConnect(playerid)
@@ -255,7 +254,6 @@ hook OnPlayerConnect(playerid)
     SetPlayerLoginAttempts(playerid, 0);
 
     LoginBlockCheck(playerid);
-    return 1;
 }
 
 forward OnLoginBlockChecked(playerid, bool:blocked, remainingSeconds);
@@ -274,7 +272,7 @@ public OnLoginBlockChecked(playerid, bool:blocked, remainingSeconds)
     return 1;
 }
 
-hook OnPlayerRequestClass(playerid, classid)
+public OnPlayerRequestClass(playerid, classid)
 {
     if (IsPlayerNPC(playerid)) {
         return 1;
@@ -284,7 +282,7 @@ hook OnPlayerRequestClass(playerid, classid)
     return 1;
 }
 
-hook OnPlayerRequestSpawn(playerid)
+public OnPlayerRequestSpawn(playerid)
 {
     return 0;
 }
@@ -295,5 +293,4 @@ hook OnPlayerDisconnect(playerid, reason)
         SaveAccount(playerid);
         SaveCharacter(playerid);
     }
-    return 1;
 }
