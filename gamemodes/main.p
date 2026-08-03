@@ -20,7 +20,6 @@
 #include "modules/animation/animation.inc"
 #include "modules/vehicle/vehicle.inc"
 #include "modules/time/time.inc"
-#include "modules/commands/commands.inc"
 #include "modules/admin/admin.inc"
 #include "modules/house/house.inc"
 #include "modules/company/company.inc"

@@ -54,7 +54,7 @@ stock AccountSave(playerid)
 
     mysql_format(GetDatabaseHandle(), query, sizeof(query),
         "UPDATE `accounts` SET `admin` = %d WHERE `id` = %d",
-        _:IsAccountAdmin(playerid),
+        _:GetAccountAdminLevel(playerid),
         GetAccountId(playerid)
     );
 

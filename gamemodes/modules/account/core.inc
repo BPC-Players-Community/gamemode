@@ -8,7 +8,7 @@
 static enum e_ACCOUNT_DATA
 {
     E_ACCOUNT_ID,
-    bool:E_ACCOUNT_ADMIN
+    E_ACCOUNT_ADMIN
 };
 
 static s_AccountData[MAX_PLAYERS][e_ACCOUNT_DATA];
@@ -30,14 +30,14 @@ stock SetAccountId(playerid, id)
     return 1;
 }
 
-stock bool:IsAccountAdmin(playerid)
+stock GetAccountAdminLevel(playerid)
 {
     return s_AccountData[playerid][E_ACCOUNT_ADMIN];
 }
 
-stock SetAccountAdmin(playerid, bool:status)
+stock SetAccountAdminLevel(playerid, level)
 {
-    s_AccountData[playerid][E_ACCOUNT_ADMIN] = status;
+    s_AccountData[playerid][E_ACCOUNT_ADMIN] = level;
     return 1;
 }
 
@@ -223,7 +223,7 @@ public OnAccountCreateResult(playerid)
     }
 
     SetAccountId(playerid, cache_insert_id());
-    SetAccountAdmin(playerid, false);
+    SetAccountAdminLevel(playerid, false);
 
     SetPlayerLogged(playerid, true);
     SetPlayerLoginAttempts(playerid, 0);
