@@ -3,8 +3,6 @@
 #endif
 #define _INC_admin_commands
 
-// irei adicionar as flags depois
-
 stock static ConnectedPlayerMessage(playerid, targetid)
 {
 	if (!IsPlayerConnected(targetid)) {
@@ -13,6 +11,7 @@ stock static ConnectedPlayerMessage(playerid, targetid)
 	return 0;
 }
 
+flags:achat(CMD_ADMIN | CMD_MODER | CMD_JR_MODER)
 CMD:achat(playerid, params[])
 {
 	if (isnull(params)) {
@@ -27,6 +26,7 @@ CMD:achat(playerid, params[])
 	return 1;
 }
 
+flags:servico(CMD_ADMIN | CMD_MODER | CMD_JR_MODER)
 CMD:servico(playerid, params[])
 {
 	static permission[1];
@@ -39,6 +39,7 @@ CMD:servico(playerid, params[])
 	return 1;
 }
 
+flags:ir(CMD_ADMIN | CMD_MODER | CMD_JR_MODER)
 CMD:ir(playerid, params[])
 {
 	new targetid;
@@ -68,6 +69,7 @@ CMD:ir(playerid, params[])
 	return 1;
 }
 
+flags:trazer(CMD_ADMIN | CMD_MODER | CMD_JR_MODER)
 CMD:trazer(playerid, params[])
 {
 	new targetid;
@@ -94,6 +96,7 @@ CMD:trazer(playerid, params[])
 	return 1;
 }
 
+flags:congelar(CMD_ADMIN | CMD_MODER)
 CMD:congelar(playerid, params[])
 {
 	new targetid;
@@ -112,6 +115,7 @@ CMD:congelar(playerid, params[])
 	return 1;
 }
 
+flags:descongelar(CMD_ADMIN | CMD_MODER)
 CMD:descongelar(playerid, params[])
 {
 	new targetid;
@@ -130,7 +134,8 @@ CMD:descongelar(playerid, params[])
 	return 1;
 }
 
-CMD:tv(playerid, params[])
+flags:telar(CMD_ADMIN | CMD_MODER | CMD_JR_MODER)
+CMD:telar(playerid, params[])
 {
 	static Float:x;
 	static Float:y;
@@ -154,12 +159,12 @@ CMD:tv(playerid, params[])
 
 	new targetid;
 	if (sscanf(params, "u", targetid)) {
-		SendClientMessage(playerid, GENERAL_COLOR, "Uso: /tv <playerid>");
+		SendClientMessage(playerid, GENERAL_COLOR, "Uso: /telar <playerid>");
 		return 1;
 	}
 
 	if (playerid == targetid) {
-		SendClientMessage(playerid, GENERAL_COLOR, "Voce nao pode se teletransportar para voce mesmo.");
+		SendClientMessage(playerid, GENERAL_COLOR, "Esse ID eh o seu.");
 		return 1;
 	}
 
@@ -180,9 +185,9 @@ CMD:tv(playerid, params[])
 	PlayerSpectatePlayer(playerid, targetid);
 	return 1;
 }
+alias:telar("tv")
 
-alias:tv("telar")
-
+flags:tvoff(CMD_ADMIN | CMD_MODER | CMD_JR_MODER)
 CMD:tvoff(playerid, params[])
 {
 	if (GetPlayerSpectateType(playerid) == 0) {
@@ -193,7 +198,6 @@ CMD:tvoff(playerid, params[])
 	TogglePlayerSpectating(playerid, false);
 	return 1;
 }
-
 /*
 CMD:advertir(playerid, params[])
 {
@@ -211,7 +215,8 @@ CMD:advertir(playerid, params[])
 	return 1;
 }
 */
-CMD:kick(playerid, params[])
+flags:expulsar(CMD_ADMIN | CMD_MODER)
+CMD:expulsar(playerid, params[])
 {
 	new targetid;
 	new message[128];
@@ -233,6 +238,7 @@ CMD:kick(playerid, params[])
 	SendClientMessage(playerid, GENERAL_COLOR, "vixxxx");
 	return 1;
 }
+alias:expulsar("kick")
 /*
 CMD:mutar(playerid, params[])
 {
@@ -320,6 +326,7 @@ CMD:colete(playerid, params[])
 	return 1;
 }
 */
+flags:setarskin(CMD_ADMIN | CMD_MODER)
 CMD:setarskin(playerid, params[])
 {
 	new targetid, skinid;
@@ -336,7 +343,6 @@ CMD:setarskin(playerid, params[])
 	SendClientMessage(playerid, GENERAL_COLOR, "Skin alterada.");
 	return 1;
 }
-
 alias:setarskin("setskin", "ss")
 
 /*
@@ -382,6 +388,7 @@ CMD:clima(playerid, params[])
 	return 1;
 }
 */
+flags:dardinheiro(CMD_ADMIN)
 CMD:dardinheiro(playerid, params[])
 {
 	new targetid, money;
@@ -398,8 +405,7 @@ CMD:dardinheiro(playerid, params[])
 	SendClientMessage(playerid, GENERAL_COLOR, "Dinheiro dado.");
 	return 1;
 }
-
-alias:dardinheiro("sm")
+alias:dardinheiro("dd")
 
 /*
 CMD:definirnivel(playerid, params[])
@@ -453,11 +459,12 @@ CMD:forcarpayday(playerid, params[])
 }
 */
 
+flags:criarveh(CMD_ADMIN)
 CMD:criarveh(playerid, params[])
 {
-	new vehicleid;
-    if (sscanf(params, "k<vehicle>", vehicleid)) {
-		SendClientMessage(playerid, GENERAL_COLOR, "SYNTAX: /criarveh <vehicleid>");
+	new vehicleModel;
+    if (sscanf(params, "k<vehicle>", vehicleModel)) {
+		SendClientMessage(playerid, GENERAL_COLOR, "SYNTAX: /criarveh <vehicleModel OR vehicleName>");
 		return 1;
 	}
 
@@ -469,14 +476,15 @@ CMD:criarveh(playerid, params[])
 	new Float:angle;
 	GetPlayerFacingAngle(playerid, angle);
 	
-	CreateVehicle(vehicleid, x, y, z + 5, angle, -1, -1, -1, true);
+	new vehicleid = CreateVehicle(vehicleModel, x, y, z + 5, angle, -1, -1, -1, true);
 
 	PutPlayerInVehicle(playerid, vehicleid, 0);
 	return 1;
 }
-alias:criarveh("v", "cv")
+alias:criarveh("cv")
 
-CMD:aa(playerid, params[])
+flags:ajudaadmin(CMD_ADMIN | CMD_MODER | CMD_JR_MODER)
+CMD:ajudaadmin(playerid, params[])
 {
 	Dialog_Show(playerid, "Comandos Administrativos", 
 		DIALOG_STYLE_MSGBOX,
@@ -491,3 +499,4 @@ CMD:aa(playerid, params[])
 	);
 	return 1;
 }
+alias:ajudaadmin("aa")
